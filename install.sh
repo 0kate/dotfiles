@@ -4,7 +4,7 @@ DOTFILES_DIR=$PWD
 TARGET_DIR=$HOME
 HOOKS_DIR=$DOTFILES_DIR/hooks
 
-DEFAULT_DOTFILES_IGNORE=".git|.dotfilesignore|hooks|install.sh"
+DEFAULT_DOTFILES_IGNORE="README.md|.git|.dotfilesignore|hooks|install.sh"
 DOTFILES_IGNORE="${DEFAULT_DOTFILES_IGNORE}|$(cat .dotfilesignore | tr '\n' '|')"
 
 set -eu
