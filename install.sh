@@ -2,11 +2,12 @@
 
 DOTFILES_DIR=$PWD
 TARGET_DIR=$HOME
+HOOKS_DIR=$DOTFILES_DIR/hooks
 
-DEFAULT_DOTFILES_IGNORE=".git|.dotfilesignore|install.sh"
+DEFAULT_DOTFILES_IGNORE=".git|.dotfilesignore|hooks|install.sh"
 DOTFILES_IGNORE="${DEFAULT_DOTFILES_IGNORE}|$(cat .dotfilesignore | tr '\n' '|')"
 
-set -eux
+set -eu
 
 dotfiles() {
     ls -A $DOTFILES_DIR | grep -v -E $DEFAULT_DOTFILES_IGNORE | xargs -I {} sh -c 'find {} -type f'
@@ -25,6 +26,6 @@ linkdotfiles() {
     done
 }
 
-echo 'Start linking my dotfiles...'
+if [ -f $HOOKS_DIR/before_link.sh ]; then source $HOOKS_DIR/before_link.sh; fi
 dotfiles | linkdotfiles
-echo 'Finish!'
+if [ -f $HOOKS_DIR/after_link.sh ]; then source $HOOKS_DIR/after_link.sh; fi
