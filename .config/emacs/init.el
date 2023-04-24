@@ -77,6 +77,9 @@
   :config
   (projectile-rails-global-mode))
 
+(use-package all-the-icons
+  :ensure t)
+
 (use-package neotree
   :ensure t
   :after (projectile)
@@ -182,10 +185,14 @@
   :config
   (add-to-list 'company-backends 'company-restclient))
 
-(use-package powerline
+;; (use-package powerline
+;;   :ensure t
+;;   :config
+;;   (powerline-center-theme))
+(use-package doom-modeline
   :ensure t
-  :config
-  (powerline-center-theme))
+  :init
+  (doom-modeline-mode 1))
 
 (use-package flycheck
   :ensure t
@@ -335,8 +342,8 @@
               scroll-margin 99999
               scroll-step 1))
 
-(add-hook 'window-setup-hook (lambda ()
-                               (set-face-background 'default (if (display-graphic-p) "#000000" "undefined"))))
+;; (add-hook 'window-setup-hook (lambda ()
+;;                                (set-face-background 'default (if (display-graphic-p) "#000000" "undefined"))))
 (add-hook 'eshell-mode-hook (lambda ()
                               (setq-local evil-mode -1)
                               (display-line-numbers-mode -1)
@@ -344,6 +351,11 @@
 (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 8)))
 (add-hook 'prog-mode-hook (lambda () (disable-scroll-margin)))
 (add-hook 'text-mode-hook (lambda () (disable-scroll-margin)))
+(add-hook 'before-make-frame-hook (lambda ()
+                                    (add-to-list 'default-frame-alist '(undecorated . t))))
+(add-hook 'after-make-frame-functions (lambda (frame)
+                                        (setq neo-theme 'icons)
+                                        (set-face-background 'default "#000000")))
 
 (add-to-list 'auto-mode-alist '("\\.jbuilder\\'" . ruby-mode))
 
@@ -364,8 +376,21 @@
 (when (version<= "26.0.50" emacs-version)
   (global-display-line-numbers-mode))
 
+(defvar frame-height-increase 1)
+
+(defun increase-frame-height ()
+  (interactive)
+  (set-frame-height (selected-frame) (+ (frame-height) frame-height-increase)))
+
+(defun decrease-frame-height ()
+  (interactive)
+  (set-frame-height (selected-frame) (- (frame-height) frame-height-increase)))
+
 ;; Basic keybinds
 (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+(global-set-key (kbd "M-n") 'increase-frame-height)
+(global-set-key (kbd "M-p") 'decrease-frame-height)
 
 ;; Debug options
 ;; (setq max-specpdl-size 5
