@@ -80,29 +80,19 @@
 (use-package all-the-icons
   :ensure t)
 
-(use-package neotree
+(use-package treemacs
   :ensure t
-  :after (projectile)
-  :init
-  (setq neo-theme 'nerd
-        neo-window-fixed-size nil
-        neo-autorefresh t)
-  (defun neotree-project-dir ()
-    "Open NeoTree using the git root."
-    (interactive)
-    (let ((project-dir (projectile-project-root))
-          (file-name (buffer-file-name)))
-      (neotree-toggle)
-      (if project-dir
-          (if (neo-global--window-exists-p)
-              (progn
-                (neotree-dir project-dir)
-                (neotree-find file-name)))
-        (message "Could not find git project root."))))
-  :bind (("C-t" .  neotree-project-dir)
-         (:map neotree-mode-map
-               ("C-f" . enlarge-window-horizontally)
-               ("C-b" . shrink-window-horizontally))))
+  :bind (("C-t" . (treemacs))
+         ("C-l" . (lambda () (enlarge-window-horizontally)))
+         ("C-h" . (lambda () (shrink-window-horizontally)))))
+
+(use-package treemacs-evil
+  :ensure t
+  :bind (("C-t" . (treemacs))))
+
+(use-package treemacs-all-the-icons
+  :ensure t
+  (treemacs-load-theme "all-the-icons"))
 
 (use-package evil
   :ensure t
@@ -115,7 +105,7 @@
   (evil-global-set-key 'normal (kbd "C-j") 'enlarge-window)
   (evil-global-set-key 'normal (kbd "C-k") 'shrink-window)
   (evil-global-set-key 'normal (kbd "C-l") 'enlarge-window-horizontally)
-  (evil-global-set-key 'normal (kbd "C-t") 'neotree-project-dir)
+  (evil-global-set-key 'normal (kbd "C-t") 'treemacs)
   :hook
   ((eshell-mode . (lambda ()
                     ;;; for input histories
@@ -125,20 +115,18 @@
                     (evil-define-key 'insert eshell-mode-map (kbd "C-w h") 'evil-window-left)
                     (evil-define-key 'insert eshell-mode-map (kbd "C-w j") 'evil-window-down)
                     (evil-define-key 'insert eshell-mode-map (kbd "C-w k") 'evil-window-up)
-                    (evil-define-key 'insert eshell-mode-map (kbd "C-w l") 'evil-window-right)
-                    ;;; for neotree
-                    (evil-define-key 'insert eshell-mode-map (kbd "C-t") 'neotree-project-dir)))
-   (neotree-mode . (lambda ()
-                     (evil-define-key 'normal neotree-mode-map (kbd "C-t") 'neotree-toggle)
-                     (evil-define-key 'normal neotree-mode-map (kbd "C-m") 'neotree-enter)
-                     (evil-define-key 'normal neotree-mode-map (kbd "RET") 'neotree-enter)
-                     (evil-define-key 'normal neotree-mode-map (kbd "h") 'shrink-window-horizontally)
-                     (evil-define-key 'normal neotree-mode-map (kbd "l") 'enlarge-window-horizontally)))))
+                    (evil-define-key 'insert eshell-mode-map (kbd "C-w l") 'evil-window-right)))
+   (treemacs-mode . (lambda ()
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-l") 'treemacs-root-down)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-h") 'treemacs-root-up)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-n") 'treemacs-create-file)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-m") 'treemacs-RET-action)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "<RET>") 'treemacs-RET-action)))))
 
 (use-package evil-collection
   :ensure t
   :config
-  (evil-collection-init '(company eshell ibuffer ivy magit neotree)))
+  (evil-collection-init '(company eshell ibuffer ivy magit)))
 
 (use-package git-gutter
   :ensure t
@@ -185,14 +173,10 @@
   :config
   (add-to-list 'company-backends 'company-restclient))
 
-;; (use-package powerline
-;;   :ensure t
-;;   :config
-;;   (powerline-center-theme))
-(use-package doom-modeline
+(use-package telephone-line
   :ensure t
-  :init
-  (doom-modeline-mode 1))
+  :config
+  (telephone-line-mode 1))
 
 (use-package flycheck
   :ensure t
@@ -231,9 +215,6 @@
 (use-package docker :ensure t)
 (use-package dockerfile-mode :ensure t)
 (use-package typescript-mode :ensure t)
-(use-package clojure-mode
-  :ensure t
-  :mode (("\\.clj\\'" . clojure-mode)))
 
 (use-package web-mode
   :ensure t
@@ -271,51 +252,17 @@
         tide-completion-detailed t)
   :hook ((web-mode . (lambda () (tide-setup)))))
 
-;; prisma-mode lsp integration
-(define-derived-mode prisma-mode js-mode "Prisma"
-  (setq-default indent-tabs-mode nil)
-  (setq tab-width 2)
-  (setq c-basic-offset 2)
-  (setq c-syntactic-indentation nil)
-  (setq js-indent-level 2))
-(add-to-list 'auto-mode-alist '("\\.prisma\\'" . prisma-mode))
-
 (use-package lsp-mode
   :ensure t
   :init
   ;; for debugging
   (when debug-lsp (setq lsp-log-io t))
-  :config
-  (lsp-dependency 'prisma-language-server
-                  '(:system "prisma-language-server")
-                  '(:npm
-                    :package "@prisma/language-server"
-                    :path "prisma-language-server"))
-
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection
-                                     (lambda ()
-                                       `(,(lsp-package-path 'prisma-language-server)
-                                         "--stdio")))
-                    :major-modes '(prisma-mode)
-                    :server-id 'prismals
-                    :activation-fn (lambda (file-name _mode)
-                                     (string= (f-ext file-name)
-                                              "prisma"))
-                    :download-server-fn (lambda (_client callback error-callback _update?)
-                                          (lsp-package-ensure
-                                           'prisma-language-server
-                                           callback
-                                           error-callback))
-                    ))
-  (add-to-list 'lsp-language-id-configuration '(prisma-mode . "prisma"))
   :hook ((c-mode . lsp)
          (ruby-mode . lsp)
          (rust-mode . lsp)
          (clojure-mode . lsp)
          (yaml-mode . lsp)
-         (dockerfile-mode . lsp)
-         (prisma-mode . lsp))
+         (dockerfile-mode . lsp))
   :custom
   ;; for clangd
   (setq lsp-clangd-binary-path (executable-find "clangd"))
@@ -344,6 +291,10 @@
 
 ;; (add-hook 'window-setup-hook (lambda ()
 ;;                                (set-face-background 'default (if (display-graphic-p) "#000000" "undefined"))))
+(add-hook 'treemacs-mode-hook (lambda ()
+                                (display-line-numbers-mode -1)
+                                (treemacs-toggle-fixed-width)
+                                (treemacs-load-theme "all-the-icons")))
 (add-hook 'eshell-mode-hook (lambda ()
                               (setq-local evil-mode -1)
                               (display-line-numbers-mode -1)
