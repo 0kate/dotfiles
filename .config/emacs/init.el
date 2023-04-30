@@ -106,6 +106,7 @@
   (evil-global-set-key 'normal (kbd "C-k") 'shrink-window)
   (evil-global-set-key 'normal (kbd "C-l") 'enlarge-window-horizontally)
   (evil-global-set-key 'normal (kbd "C-t") 'treemacs)
+  (evil-global-set-key 'insert (kbd "C-t") 'treemacs)
   :hook
   ((eshell-mode . (lambda ()
                     ;;; for input histories
