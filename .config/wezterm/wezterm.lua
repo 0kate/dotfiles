@@ -29,9 +29,6 @@ config.keys = {
 }
 config.line_height = 1.1
 config.window_decorations = 'RESIZE'
-config.window_frame = {
-  active_titlebar_bg = '#000000',
-}
 config.window_padding = {
   top = 1,
   right = 1,
