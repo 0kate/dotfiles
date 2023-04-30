@@ -101,11 +101,15 @@
   :config
   (evil-mode 1)
   (setq evil-want-keybinding t)
+  ;; normal mode
   (evil-global-set-key 'normal (kbd "C-h") 'shrink-window-horizontally)
   (evil-global-set-key 'normal (kbd "C-j") 'enlarge-window)
   (evil-global-set-key 'normal (kbd "C-k") 'shrink-window)
   (evil-global-set-key 'normal (kbd "C-l") 'enlarge-window-horizontally)
   (evil-global-set-key 'normal (kbd "C-t") 'treemacs)
+  ;; insert mode
+  (evil-global-set-key 'insert (kbd "C-h") 'shrink-window-horizontally)
+  (evil-global-set-key 'insert (kbd "C-l") 'enlarge-window-horizontally)
   (evil-global-set-key 'insert (kbd "C-t") 'treemacs)
   :hook
   ((eshell-mode . (lambda ()
