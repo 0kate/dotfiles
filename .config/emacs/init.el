@@ -82,8 +82,10 @@
 (use-package treemacs
   :ensure t
   :init
+  (setq treemacs-indentation 1)
   (setq treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#707070")))
   :config
+  (treemacs-indentation 1)
   (treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#909090")))
   (treemacs-indent-guide-mode t)
   (treemacs-git-commit-diff-mode t)
