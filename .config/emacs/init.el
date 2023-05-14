@@ -88,22 +88,21 @@
   :config
   (projectile-rails-global-mode))
 
-(use-package all-the-icons
-  :ensure t)
-
 (use-package treemacs
   :ensure t
-  :bind (("C-t" . (treemacs))
-         ("C-l" . (lambda () (enlarge-window-horizontally)))
-         ("C-h" . (lambda () (shrink-window-horizontally)))))
+  :bind (("C-t" . treemacs)
+         ("C-l" . enlarge-window-horizontally)
+         ("C-h" . shrink-window-horizontally)))
 
 (use-package treemacs-evil
   :ensure t
-  :bind (("C-t" . (treemacs))))
+  :after (treemacs evil)
+  :bind (("C-t" . treemacs)))
 
-(use-package treemacs-all-the-icons
+(use-package treemacs-nerd-icons
   :ensure t
-  (treemacs-load-theme "all-the-icons"))
+  :config
+  (treemacs-load-theme "nerd-icons"))
 
 (use-package evil
   :ensure t
@@ -141,6 +140,7 @@
 
 (use-package evil-collection
   :ensure t
+  :after (company ivy magit)
   :config
   (evil-collection-init '(company eshell ibuffer ivy magit)))
 
@@ -166,6 +166,11 @@
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?┊)
   :hook ((prog-mode . highlight-indent-guides-mode)))
+
+(use-package nerd-icons
+  :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el" :files (:defaults "data"))
+  :custom
+  (nerd-icons-font-family "Hack Nerd Font Mono"))
 
 (use-package rainbow-mode :ensure t)
 
@@ -298,6 +303,7 @@
          (rust-mode . lsp)
          (typescript-mode . lsp)
          (typescript-tsx-mode . lsp)
+         (prisma-mode . lsp)
          (clojure-mode . lsp)
          (yaml-mode . lsp)
          (web-mode . lsp)
@@ -318,7 +324,17 @@
   :after (lsp-mode)
   :init
   (setq lsp-ui-sideline-show-diagnostics t
-        lsp-ui-sideline-show-code-actions t))
+        lsp-ui-sideline-show-hover t
+        lsp-ui-sideline-show-code-actions t)
+  :config
+  (lsp-ui-peek-enable t)
+  (lsp-ui-doc-enable t))
+
+(use-package lsp-treemacs
+  :ensure t
+  :after (lsp-mode treemacs)
+  :config
+  (lsp-treemacs-sync-mode 1))
 
 
 ;; Hooks
@@ -331,8 +347,7 @@
 ;;                                (set-face-background 'default (if (display-graphic-p) "#000000" "undefined"))))
 (add-hook 'treemacs-mode-hook (lambda ()
                                 (display-line-numbers-mode -1)
-                                (treemacs-toggle-fixed-width)
-                                (treemacs-load-theme "all-the-icons")))
+                                (treemacs-toggle-fixed-width)))
 (add-hook 'eshell-mode-hook (lambda ()
                               (setq-local evil-mode -1)
                               (display-line-numbers-mode -1)
