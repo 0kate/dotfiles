@@ -10,11 +10,9 @@
 ;; (defvar with-profiler (seq-contains-p command-line-args "--with-profiler"))
 ;; (defvar with-refresh-packages (seq-contains-p command-line-args "--with-refresh-packages"))
 ;; (defvar with-clipboard (seq-contains-p command-line-args "--with-clipboard"))
-;; (defvar debug-lsp (seq-contains-p command-line-args "--debug-lsp"))
 (defvar with-profiler t)
 (defvar with-refresh-packages t)
 (defvar with-clipboard t)
-(defvar debug-lsp nil)
 
 ;;; Profiler:
 (when with-profiler
@@ -37,6 +35,19 @@
     (package-install 'use-package)
     (message "use-package is installed!"))
   (require 'use-package))
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 6))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 ;; We need this import for compiled init file.
 ;; In uncompiled init.el, use-package will autoload bind-key package.
@@ -219,7 +230,34 @@
 (use-package rust-mode :ensure t)
 (use-package docker :ensure t)
 (use-package dockerfile-mode :ensure t)
-(use-package typescript-mode :ensure t)
+(use-package typescript-mode
+  :ensure t
+  :after (tide)
+  :hook ((typescript-mode . setup-tide-mode)))
+
+(use-package json-mode
+  :ensure t
+  :init
+  (setq js-indent-level 2))
+
+(use-package tide
+  :ensure t
+  :after (typescript-mode)
+  :init
+  (setq tide-completion-ignore-case t
+        tide-completion-show-source t
+        tide-completion-fuzzy t
+        tide-completion-detailed t)
+  :config
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+  :hook ((web-mode . (lambda () (tide-setup)))))
 
 (use-package web-mode
   :ensure t
@@ -235,38 +273,34 @@
   :mode (("\\.js\\'" . web-mode)
          ("\\.jsx\\'" . web-mode)
          ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode)
-         ("\\.mjs\\'" . web-mode))
+         ("\\.tsx\\'" . web-mode))
+  :config
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  :hook ((web-mode . (lambda ()
+                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                         (setup-tide-mode)))))
   :custom
   (web-mode-tag-auto-close-style 2)
   :custom-face
   (web-mode-html-tag-bracket-face ((t (:foreground "#909090")))))
 
-(use-package json-mode
+(use-package emacs-prisma-mode
   :ensure t
-  :init
-  (setq js-indent-level 2))
-
-(use-package tide
-  :ensure t
-  :after (typescript-mode)
-  :init
-  (setq tide-completion-ignore-case t
-        tide-completion-show-source t
-        tide-completion-fuzzy t
-        tide-completion-detailed t)
-  :hook ((web-mode . (lambda () (tide-setup)))))
+  :straight (emacs-prisma-mode :type git :host github :repo "pimeys/emacs-prisma-mode"))
 
 (use-package lsp-mode
   :ensure t
   :init
   ;; for debugging
-  (when debug-lsp (setq lsp-log-io t))
+  ;; (when debug-lsp (setq lsp-log-io t))
   :hook ((c-mode . lsp)
          (ruby-mode . lsp)
          (rust-mode . lsp)
+         (typescript-mode . lsp)
+         (typescript-tsx-mode . lsp)
          (clojure-mode . lsp)
          (yaml-mode . lsp)
+         (web-mode . lsp)
          (dockerfile-mode . lsp))
   :custom
   ;; for clangd
@@ -285,7 +319,6 @@
   :init
   (setq lsp-ui-sideline-show-diagnostics t
         lsp-ui-sideline-show-code-actions t))
-
 
 
 ;; Hooks
@@ -318,7 +351,8 @@
 
 
 ;; Basic options
-(setq-default indent-tabs-mode nil)
+(setq-default truncate-lines 1
+              indent-tabs-mode nil)
 (setq make-backup-files nil
       auto-save-default nil
       create-lockfiles nil)
