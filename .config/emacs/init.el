@@ -90,6 +90,8 @@
 
 (use-package treemacs
   :ensure t
+  :config
+  (treemacs-indent-guide-mode t)
   :bind (("C-t" . treemacs)
          ("C-l" . enlarge-window-horizontally)
          ("C-h" . shrink-window-horizontally)))
@@ -98,6 +100,14 @@
   :ensure t
   :after (treemacs evil)
   :bind (("C-t" . treemacs)))
+
+(use-package treemacs-projectile
+  :ensure t
+  :after (treemacs projectile))
+
+(use-package treemacs-magit
+  :ensure t
+  :after (treemacs magit))
 
 (use-package treemacs-nerd-icons
   :ensure t
@@ -132,9 +142,12 @@
                     (evil-define-key 'insert eshell-mode-map (kbd "C-w k") 'evil-window-up)
                     (evil-define-key 'insert eshell-mode-map (kbd "C-w l") 'evil-window-right)))
    (treemacs-mode . (lambda ()
-                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-l") 'treemacs-root-down)
-                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-h") 'treemacs-root-up)
-                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-n") 'treemacs-create-file)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-c") 'treemacs-root-down)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-b") 'treemacs-root-up)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-d") 'treemacs-create-dir)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-f") 'treemacs-create-file)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-c C-h") 'treemacs-toggle-show-dotfiles)
+                      (evil-define-key 'normal treemacs-mode-map (kbd "C-d C-d") 'treemacs-delete)
                       (evil-define-key 'normal treemacs-mode-map (kbd "C-m") 'treemacs-RET-action)
                       (evil-define-key 'normal treemacs-mode-map (kbd "<RET>") 'treemacs-RET-action)))))
 
@@ -198,6 +211,11 @@
   :ensure t
   :config
   (telephone-line-mode 1))
+
+(use-package beacon
+  :ensure t
+  :config
+  (beacon-mode t))
 
 (use-package flycheck
   :ensure t
