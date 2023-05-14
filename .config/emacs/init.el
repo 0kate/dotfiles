@@ -55,15 +55,6 @@
 ;; For more details, see https://github.com/jwiegley/use-package/issues/436.
 (require 'bind-key)
 
-;; (add-to-list 'load-path "/home/kate/.config/emacs/scripts")
-
-;; (load "my-eshell.el")
-
-;; (load "exec-path-from-asdf.el")
-;; (exec-path-from-asdf-initialize)
-;; (load "clipper.el")
-;; (clipper-setup)
-
 
 ;; Packages (Enhancements)
 (use-package monokai-theme
@@ -90,8 +81,12 @@
 
 (use-package treemacs
   :ensure t
+  :init
+  (setq treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#707070")))
   :config
+  (treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#909090")))
   (treemacs-indent-guide-mode t)
+  (treemacs-git-commit-diff-mode t)
   :bind (("C-t" . treemacs)
          ("C-l" . enlarge-window-horizontally)
          ("C-h" . shrink-window-horizontally)))
@@ -361,8 +356,6 @@
               scroll-margin 99999
               scroll-step 1))
 
-;; (add-hook 'window-setup-hook (lambda ()
-;;                                (set-face-background 'default (if (display-graphic-p) "#000000" "undefined"))))
 (add-hook 'treemacs-mode-hook (lambda ()
                                 (display-line-numbers-mode -1)
                                 (treemacs-toggle-fixed-width)))
