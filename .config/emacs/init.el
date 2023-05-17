@@ -81,14 +81,12 @@
 
 (use-package treemacs
   :ensure t
-  :init
-  (setq treemacs-indentation 1)
-  (setq treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#707070")))
+  :defer t
   :config
-  (treemacs-indentation 1)
-  (treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#909090")))
-  (treemacs-indent-guide-mode t)
-  (treemacs-git-commit-diff-mode t)
+  (progn
+    (treemacs-indent-guide-mode t)
+    (setq treemacs-indentation        1
+          treemacs-indentation-string (propertize "┊ " 'face '(:foreground "#909090"))))
   :bind (("C-t" . treemacs)
          ("C-l" . enlarge-window-horizontally)
          ("C-h" . shrink-window-horizontally)))
@@ -109,7 +107,8 @@
 (use-package treemacs-nerd-icons
   :ensure t
   :config
-  (treemacs-load-theme "nerd-icons"))
+  (with-eval-after-load 'treemacs
+    (treemacs-load-theme "nerd-icons")))
 
 (use-package evil
   :ensure t
@@ -180,7 +179,7 @@
 (use-package nerd-icons
   :straight (nerd-icons :type git :host github :repo "rainstormstudio/nerd-icons.el" :files (:defaults "data"))
   :custom
-  (nerd-icons-font-family "Hack Nerd Font Mono"))
+  (nerd-icons-font-family "Hack Nerd Font"))
 
 (use-package rainbow-mode :ensure t)
 
