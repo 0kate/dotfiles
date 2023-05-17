@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=sxhkd
+Comments=Simple X hotkey daemon
+Exec=/usr/bin/sxhkd
+Termianl=false
+Type=Application
