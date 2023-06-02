@@ -57,6 +57,9 @@
 
 
 ;; Packages (Enhancements)
+(use-package vterm
+  :ensure t)
+
 (use-package monokai-theme
   :ensure t
   :config
@@ -128,7 +131,16 @@
   (evil-global-set-key 'insert (kbd "C-l") 'enlarge-window-horizontally)
   (evil-global-set-key 'insert (kbd "C-t") 'treemacs)
   :hook
-  ((eshell-mode . (lambda ()
+  ((vterm-mode . (lambda ()
+                   ;;; for input histories
+                   (evil-define-key 'insert vterm-mode-map (kbd "C-p") 'vterm-previous-prompt)
+                   (evil-define-key 'insert vterm-mode-map (kbd "C-n") 'vterm-next-prompt)
+                   ;;; for moving windows
+                   (evil-define-key 'insert vterm-mode-map (kbd "C-w h") 'evil-window-left)
+                   (evil-define-key 'insert vterm-mode-map (kbd "C-w j") 'evil-window-down)
+                   (evil-define-key 'insert vterm-mode-map (kbd "C-w k") 'evil-window-up)
+                   (evil-define-key 'insert vterm-mode-map (kbd "C-w l") 'evil-window-right)))
+   (eshell-mode . (lambda ()
                     ;;; for input histories
                     (evil-define-key 'insert eshell-mode-map (kbd "C-p") 'eshell-previous-input)
                     (evil-define-key 'insert eshell-mode-map (kbd "C-n") 'eshell-next-input)
@@ -151,7 +163,7 @@
   :ensure t
   :after (company ivy magit)
   :config
-  (evil-collection-init '(company eshell ibuffer ivy magit)))
+  (evil-collection-init '(company eshell vterm ibuffer ivy magit)))
 
 (use-package git-gutter
   :ensure t
