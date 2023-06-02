@@ -257,63 +257,35 @@
 
 (use-package magit :ensure t)
 
+(use-package tree-sitter
+  :ensure t
+  :after (typescript-mode)
+  :hook ((typescript-mode . tree-sitter-hl-mode)
+         (typescript-tsx-mode . tree-sitter-hl-mode)))
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after (tree-sitter)
+  :config
+  (tree-sitter-require 'tsx)
+  (add-to-list 'tree-sitter-major-mode-language-alist '(typescript-tsx-mode . tsx)))
+
 (use-package yaml-mode :ensure t)
 (use-package rust-mode :ensure t)
 (use-package docker :ensure t)
 (use-package dockerfile-mode :ensure t)
 (use-package typescript-mode
   :ensure t
-  :after (tide)
-  :hook ((typescript-mode . setup-tide-mode)))
+  :init
+  (define-derived-mode typescript-tsx-mode typescript-mode "tsx")
+  :config
+  (setq typescript-indent-level 2)
+  (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . typescript-tsx-mode)))
 
 (use-package json-mode
   :ensure t
   :init
   (setq js-indent-level 2))
-
-(use-package tide
-  :ensure t
-  :after (typescript-mode)
-  :init
-  (setq tide-completion-ignore-case t
-        tide-completion-show-source t
-        tide-completion-fuzzy t
-        tide-completion-detailed t)
-  :config
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1))
-  :hook ((web-mode . (lambda () (tide-setup)))))
-
-(use-package web-mode
-  :ensure t
-  :init
-  (setq web-mode-attr-indent-offset nil
-        web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-enable-current-element-highlight t)
-  (setq web-mode-enable-auto-closing t
-        web-mode-enable-auto-pairing t
-        web-mode-auto-close-style 2)
-  :mode (("\\.js\\'" . web-mode)
-         ("\\.jsx\\'" . web-mode)
-         ("\\.ts\\'" . web-mode)
-         ("\\.tsx\\'" . web-mode))
-  :config
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
-  :hook ((web-mode . (lambda ()
-                       (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                         (setup-tide-mode)))))
-  :custom
-  (web-mode-tag-auto-close-style 2)
-  :custom-face
-  (web-mode-html-tag-bracket-face ((t (:foreground "#909090")))))
 
 (use-package emacs-prisma-mode
   :ensure t
@@ -328,11 +300,9 @@
          (ruby-mode . lsp)
          (rust-mode . lsp)
          (typescript-mode . lsp)
-         (typescript-tsx-mode . lsp)
          (prisma-mode . lsp)
          (clojure-mode . lsp)
          (yaml-mode . lsp)
-         (web-mode . lsp)
          (dockerfile-mode . lsp))
   :custom
   ;; for clangd
@@ -376,6 +346,9 @@
                               (setq-local evil-mode -1)
                               (display-line-numbers-mode -1)
                               (eshell-disable-buffer-control)))
+(add-hook 'vterm-mode-hook (lambda ()
+                             (setq-local evil-mode -1)
+                             (display-line-numbers-mode -1)))
 (add-hook 'c-mode-hook (lambda () (setq c-basic-offset 8)))
 (add-hook 'prog-mode-hook (lambda () (disable-scroll-margin)))
 (add-hook 'text-mode-hook (lambda () (disable-scroll-margin)))
