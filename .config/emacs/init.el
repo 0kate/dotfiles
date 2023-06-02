@@ -291,6 +291,11 @@
   :ensure t
   :straight (emacs-prisma-mode :type git :host github :repo "pimeys/emacs-prisma-mode"))
 
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+
 (use-package lsp-mode
   :ensure t
   :init
