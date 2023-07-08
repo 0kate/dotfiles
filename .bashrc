@@ -116,13 +116,17 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# local executables
+export PATH=$PATH:$HOME/.local/bin
+
 # emacsclient
 alias ec="emacsclient"
 
 # asdf
 . $HOME/.asdf/asdf.sh
 . $HOME/.asdf/completions/asdf.bash
-. "$HOME/.cargo/env"
+. $HOME/.cargo/env
+
 
 # rustup
 export PATH=$PATH:$HOME/.cargo/bin
@@ -145,3 +149,16 @@ source ~/.git-prompt.sh
 
 # direnv
 eval "$(direnv hook bash)"
+
+# rtx
+# export PATH=$PATH:$HOME/.local/share/rtx/bin
+# eval "$(rtx activate bash)"
+
+# pnpm
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+source "${XDG_CONFIG_HOME:-$HOME/.config}/asdf-direnv/bashrc"
