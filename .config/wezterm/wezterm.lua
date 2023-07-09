@@ -1,9 +1,7 @@
 local wezterm = require 'wezterm'
 local config = {}
 
-config.colors = {
-  cursor_bg = '#999999',
-}
+config.color_scheme = 'Ayu Mirage (Gogh)'
 config.cursor_blink_ease_in = 'Constant'
 config.cursor_blink_ease_out = 'Constant'
 config.cursor_blink_rate = 500
