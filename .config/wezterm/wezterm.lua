@@ -12,23 +12,6 @@ config.font = wezterm.font_with_fallback({
   { family = 'Hack Nerd Font' },
   { family = 'Hack Nerd Font', assume_emoji_presentation = true },
 })
-config.keys = {
-  {
-    key = 'f',
-    mods = 'CMD',
-    action = wezterm.action.SendString '\x1bf',
-  },
-  {
-    key = 'b',
-    mods = 'CMD',
-    action = wezterm.action.SendString '\x1bb',
-  },
-  {
-    key = 'x',
-    mods = 'CMD',
-    action = wezterm.action.SendString '\x1bx',
-  },
-}
 config.line_height = 1.2
 config.underline_position = -2
 config.underline_thickness = 2
