@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+WIN_ID=$(xdotool getactivewindow)
+CURRENT_HEIGHT=$(xwininfo -id $WIN_ID -frame | grep Height | awk -F ' ' '{print $2}')
+CURRENT_WIDTH=$(xwininfo -id $WIN_ID -frame | grep Width | awk -F ' ' '{print $2}')
+
+xdotool windowsize $WIN_ID $CURRENT_WIDTH $((CURRENT_HEIGHT + 10))
