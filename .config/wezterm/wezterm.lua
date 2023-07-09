@@ -13,8 +13,6 @@ config.font = wezterm.font_with_fallback({
   { family = 'Hack Nerd Font', assume_emoji_presentation = true },
 })
 config.line_height = 1.2
-config.underline_position = -2
-config.underline_thickness = 2
 config.use_ime = true
 config.window_decorations = 'RESIZE'
 config.window_padding = {
