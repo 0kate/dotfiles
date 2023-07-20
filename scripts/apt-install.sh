@@ -35,10 +35,18 @@ fisher install IlanCosman/tide@v5
 
 # asdf
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.12.1
-asdf plugin-add golang https://github.com/kennyp/asdf-golang.git
-asdf install golang latest && asdf global golang latest
+
+## add plugins
 asdf plugin-add direnv
+asdf plugin-add golang https://github.com/kennyp/asdf-golang.git
+asdf plugin-add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+asdf plugin-add ruby https://github.com/asdf-vm/asdf-ruby.git
+
+## setup
 asdf direnv setup --shell fish --version latest
+asdf install golang latest && asdf global golang latest
+asdf install nodejs latest && asdf global nodejs latest
+asdf install ruby latest && asdf global ruby latest
 
 # rustup
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
